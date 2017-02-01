@@ -26,6 +26,25 @@ services:
       placement:
         constraints: [node.role == manager]
 
+  lets-encrypt:
+    image: pinked/docker-flow-lets-encrypt-godaddy
+    networks:
+      - proxy
+    volumes:
+      - /etc/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DF_NOTIF_CERT_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/cert
+      - REFRESH=20m
+      - TLD=${TLD}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - GD_KEY=${GD_KEY}
+      - GD_SECRET=${GD_SECRET}
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
 networks:
   proxy:
     external: true
