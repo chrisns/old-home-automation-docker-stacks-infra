@@ -12,6 +12,9 @@ services:
       - MODE=swarm
     deploy:
       replicas: 2
+      restart_policy:
+        condition: any
+        delay: 5s
 
   swarm-listener:
     image: vfarcic/docker-flow-swarm-listener
@@ -25,6 +28,9 @@ services:
     deploy:
       placement:
         constraints: [node.role == manager]
+      restart_policy:
+        condition: any
+        delay: 5s
 
   lets-encrypt:
     image: pinked/docker-flow-lets-encrypt-godaddy
@@ -42,6 +48,9 @@ services:
       - GD_SECRET=${GD_SECRET}
     deploy:
       replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
       placement:
         constraints: [node.role == manager]
 
