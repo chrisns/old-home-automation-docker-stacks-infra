@@ -11,13 +11,14 @@ services:
       - LISTENER_ADDRESS=swarm-listener
       - MODE=swarm
     deploy:
-      replicas: 2
+      mode: global
       restart_policy:
         condition: any
         delay: 5s
 
   swarm-listener:
     image: vfarcic/docker-flow-swarm-listener
+    privileged: true
     networks:
       - proxy
     volumes:
@@ -26,6 +27,7 @@ services:
       - DF_NOTIF_CREATE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/reconfigure
       - DF_NOTIF_REMOVE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/remove
     deploy:
+      replicas: 1
       placement:
         constraints: [node.role == manager]
       restart_policy:
@@ -34,6 +36,7 @@ services:
 
   lets-encrypt:
     image: pinked/docker-flow-lets-encrypt-godaddy
+    privileged: true
     networks:
       - proxy
     volumes:
