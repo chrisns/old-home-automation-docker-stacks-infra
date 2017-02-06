@@ -40,7 +40,7 @@ services:
     networks:
       - proxy
     volumes:
-      - /etc/letsencrypt
+      - letsencrypt:/etc/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - DF_NOTIF_CERT_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/cert
@@ -58,5 +58,11 @@ services:
         constraints: [node.role == manager]
 
 networks:
+  default:
+    external: false
   proxy:
+    external: true
+
+volumes:
+  letsencrypt:
     external: true
