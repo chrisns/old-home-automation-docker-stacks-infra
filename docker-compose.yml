@@ -18,7 +18,6 @@ services:
 
   swarm-listener:
     image: vfarcic/docker-flow-swarm-listener
-    privileged: true
     networks:
       - proxy
     volumes:
@@ -36,7 +35,6 @@ services:
 
   lets-encrypt:
     image: pinked/docker-flow-lets-encrypt-godaddy
-    privileged: true
     networks:
       - proxy
     volumes:
@@ -65,4 +63,7 @@ networks:
 
 volumes:
   letsencrypt:
-    external: true
+    driver: nfs
+    driver_opts:
+      share: "192.168.0.3:/volume2/cluster/letsencrypt"
+~                                                              
