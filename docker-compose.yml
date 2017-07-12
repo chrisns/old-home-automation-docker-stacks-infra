@@ -2,6 +2,11 @@ version: "3"
 services:
   proxy:
     image: pinked/docker-flow-proxy-refreshing-error-pages
+    healthcheck:
+      test: "wget -q -O /dev/null $STATS_USER:$STATS_PASS@localhost/admin?stats || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 3
     ports:
       - 80:80
       - 443:443
