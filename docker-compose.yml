@@ -10,6 +10,8 @@ services:
     environment:
       - LISTENER_ADDRESS=swarm-listener
       - MODE=swarm
+      - STATS_USER=${STATS_USER}
+      - STATS_PASS=${STATS_PASS}
     deploy:
       replicas: 2
       restart_policy:
