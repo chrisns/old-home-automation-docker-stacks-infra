@@ -18,6 +18,9 @@ services:
       - STATS_USER=${STATS_USER}
       - STATS_PASS=${STATS_PASS}
     deploy:
+      update_config:
+        parallelism: 1
+        delay: 10s
       replicas: 2
       restart_policy:
         condition: any
