@@ -1,7 +1,7 @@
 version: "3"
 services:
   proxy:
-    image: vfarcic/docker-flow-proxy
+    image: pinked/docker-flow-proxy-refreshing-error-pages
     ports:
       - 80:80
       - 443:443
