@@ -43,6 +43,20 @@ services:
         condition: any
         delay: 5s
 
+  cron:
+    image: pinked/docker-flow-cron2
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DF_UPDATE_SCHEDULE=5 5 * * * *
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: any
+        delay: 5s
+
   lets-encrypt:
     labels:
       - com.df.cron2=true
