@@ -77,7 +77,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - DF_NOTIF_CERT_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/cert
-      - REFRESH=20m
       - TLD=${TLD}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - GD_KEY=${GD_KEY}
