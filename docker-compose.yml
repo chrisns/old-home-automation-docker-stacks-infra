@@ -44,6 +44,10 @@ services:
         delay: 5s
 
   lets-encrypt:
+    labels:
+      - com.df.cron2=true
+      - com.df.distribute=true
+      - com.df.schedule=0 30 * * * *
     image: pinked/docker-flow-lets-encrypt-godaddy
     networks:
       - proxy
@@ -58,10 +62,7 @@ services:
       - GD_KEY=${GD_KEY}
       - GD_SECRET=${GD_SECRET}
     deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-        delay: 5s
+      replicas: 0
       placement:
         constraints: [node.role == manager]
 
