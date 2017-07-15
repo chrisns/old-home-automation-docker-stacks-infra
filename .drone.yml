@@ -2,7 +2,7 @@ pipeline:
 
   deploy:
     image: docker
-    secrets: [ GD_KEY, GD_SECRET, CERTBOT_EMAIL, USER, PASS, MQTT ]
+    secrets: [ GD_KEY, GD_SECRET, CERTBOT_EMAIL, USER, PASS, MQTT, STATS_USER, STATS_PASS]
     commands:
       - docker deploy --compose-file docker-compose.yml proxy
     volumes:
