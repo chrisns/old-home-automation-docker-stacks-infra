@@ -17,6 +17,7 @@ services:
       - MODE=swarm
       - STATS_USER=${STATS_USER}
       - STATS_PASS=${STATS_PASS}
+    read_only: true
     deploy:
       update_config:
         parallelism: 1
@@ -37,6 +38,7 @@ services:
     image: vfarcic/docker-flow-swarm-listener
     networks:
       - proxy
+    read_only: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -52,6 +54,7 @@ services:
 
   cron:
     image: pinked/docker-flow-cron2
+    read_only: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -72,6 +75,7 @@ services:
         delay: 5s
 
   lets-encrypt:
+    read_only: true
     labels:
       - com.df.cron2=true
       - com.df.distribute=true
