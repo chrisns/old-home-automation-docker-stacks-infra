@@ -93,7 +93,8 @@ services:
       - GD_KEY=${GD_KEY}
       - GD_SECRET=${GD_SECRET}
     deploy:
-      restart_policy: none
+      restart_policy:
+        condition: none
       replicas: 0
       resources:
         limits:
