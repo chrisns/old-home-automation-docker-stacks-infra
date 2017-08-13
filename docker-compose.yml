@@ -17,7 +17,6 @@ services:
       - MODE=swarm
       - STATS_USER=${STATS_USER}
       - STATS_PASS=${STATS_PASS}
-    read_only: true
     deploy:
       update_config:
         parallelism: 1
@@ -38,7 +37,6 @@ services:
     image: vfarcic/docker-flow-swarm-listener
     networks:
       - proxy
-    read_only: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
