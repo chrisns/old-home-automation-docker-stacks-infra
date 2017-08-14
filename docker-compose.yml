@@ -86,6 +86,7 @@ services:
     environment:
       - DF_NOTIF_CERT_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/cert
       - TLD=${TLD}
+      - CNAME=${CNAME}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
       - GD_KEY=${GD_KEY}
       - GD_SECRET=${GD_SECRET}
