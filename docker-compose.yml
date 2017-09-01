@@ -56,7 +56,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - DF_UPDATE_SCHEDULE=5 5 * * * *
+      - DF_UPDATE_SCHEDULE=/5 * * * *
     deploy:
       replicas: 1
       resources:
@@ -76,7 +76,7 @@ services:
     labels:
       - com.df.cron2=true
       - com.df.distribute=true
-      - com.df.schedule=0 30 * * * *
+      - com.df.schedule=/10 * * * *
     image: pinked/docker-flow-lets-encrypt-godaddy
     networks:
       - proxy
@@ -92,7 +92,7 @@ services:
       - GD_SECRET=${GD_SECRET}
     deploy:
       restart_policy:
-        condition: none
+        condition: on-failure
       replicas: 0
       resources:
         limits:
