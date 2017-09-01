@@ -1,0 +1,3 @@
+- src: whiskerlabs.watchdog
+- src: atosatto.docker-swarm
+- src: angstwad.docker_ubuntu

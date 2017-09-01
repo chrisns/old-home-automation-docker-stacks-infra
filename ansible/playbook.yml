@@ -1,0 +1,248 @@
+---
+
+- hosts: 1.p.cns.me
+  become: yes
+  tasks:
+    - name: add zwave docker binder
+      copy:
+        src: templates/zwave-bind.sh
+        dest: /root/zwave-bind.sh
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: zwave binding
+      cron:
+        name: zwave binding
+        job: "/root/zwave-bind.sh"
+        state: present
+
+- hosts: swarm
+  any_errors_fatal: True
+  vars:
+    watchdog_max_load_1: 24
+    watchdog_max_load_5: 18
+    watchdog_max_load_15: 13
+    watchdog_min_memory: 2
+    watchdog_ping_addrs: [127.0.0.1]
+    rsyslog_host: 192.168.0.3
+    rsyslog_port: 514
+    skip_docker_py: true
+    skip_group: true
+    skip_engine: true
+    pip_install_pip: false
+    pip_install_setuptools: false
+    pip_install_docker: false
+    pip_install_docker_compose: false
+    docker_group_members: ["cns"]
+
+  become: yes
+  roles:
+    - { role: whiskerlabs.watchdog } 
+    - { role: atosatto.docker-swarm }
+    - { role: angstwad.docker_ubuntu }
+
+  tasks:
+    - name: prune docker cron job
+      cron:
+        name: prune docker
+        minute: "0"
+        hour: "5"
+        job: "docker system prune -af"
+        state: present
+
+    - name: aptitude
+      apt:
+        name: aptitude
+        state: present
+
+    - name: system is up to date
+      apt:
+        upgrade: safe
+        update_cache: yes
+
+    - name: Remove useless packages
+      apt:
+        autoremove: true
+
+    - name: Remove useless packages from the cache
+      apt:
+        autoclean: yes
+
+    - name: rsyslog
+      apt:
+        name: rsyslog-gnutls
+        state: latest
+        install_recommends: no
+
+    - name: Remove dependencies that are no longer required
+      apt:
+        autoremove: yes
+
+    - name: Get synology certificate
+      shell: "openssl s_client -showcerts -connect {{ rsyslog_host }}:{{ rsyslog_port }} </dev/null > /etc/rsyslog-cert.crt"
+      args:
+        creates: /etc/rsyslog-cert.crt
+      notify:
+        - Restart Rsyslog
+
+    - name: Setup remote logging
+      template:
+        src: templates/rsyslog.conf
+        dest: /etc/rsyslog.d/90-remote-logging.conf
+        validate: rsyslogd -N1 -f /etc/rsyslog.d/90-remote-logging.conf
+      notify:
+        - Restart Rsyslog
+
+    - set_fact: wait_host="{{ ansible_host }}"
+
+    - name: Wait for server to come back
+      local_action: wait_for host={{wait_host}} port=22 state=started
+      become: false
+
+    - name: Set gluster to restart on network change
+      template:
+        src: templates/gluster_if-up.sh
+        dest: /etc/network/if-up.d/gluster
+        mode: 0755
+
+    - name: Restart Rsyslog
+      service:
+        name: rsyslog
+        state: restarted
+        enabled: yes
+
+    - name: create domoticz_zwave_config gluster volume with multiple bricks
+      gluster_volume:
+        state: present
+        name: domoticz_zwave_config
+        replicas: 4
+        force: true
+        bricks: /brick/domoticz_zwave_config
+        cluster:
+          - 1.p.cns.me
+          - 2.p.cns.me
+          - 3.p.cns.me
+          - 4.p.cns.me
+      run_once: true
+
+    - name: create proxy_letsencrypt gluster volume with multiple bricks
+      gluster_volume:
+        state: present
+        name: proxy_letsencrypt
+        replicas: 4
+        force: true
+        bricks: /brick/proxy_letsencrypt
+        cluster:
+          - 1.p.cns.me
+          - 2.p.cns.me
+          - 3.p.cns.me
+          - 4.p.cns.me
+      run_once: true
+
+    - name: create drone_data gluster volume with multiple bricks
+      gluster_volume:
+        state: present
+        name: drone_data
+        replicas: 4
+        force: true
+        bricks: /brick/drone_data
+        cluster:
+          - 1.p.cns.me
+          - 2.p.cns.me
+          - 3.p.cns.me
+          - 4.p.cns.me
+      run_once: true
+
+    - name: create mqtt_data gluster volume with multiple bricks
+      gluster_volume:
+        state: present
+        name: mqtt_data
+        replicas: 4
+        force: true
+        bricks: /brick/mqtt_data
+        cluster:
+          - 1.p.cns.me
+          - 2.p.cns.me
+          - 3.p.cns.me
+          - 4.p.cns.me
+      run_once: true
+
+    - name: create influx_data gluster volume with multiple bricks
+      gluster_volume:
+        state: present
+        name: influx_data
+        replicas: 4
+        force: true
+        bricks: /brick/influx_data
+        cluster:
+          - 1.p.cns.me
+          - 2.p.cns.me
+          - 3.p.cns.me
+          - 4.p.cns.me
+      run_once: true
+
+    - name: create influx_chronograf gluster volume with multiple bricks
+      gluster_volume:
+        state: present
+        name: influx_chronograf
+        replicas: 4
+        force: true
+        bricks: /brick/influx_chronograf
+        cluster:
+          - 1.p.cns.me
+          - 2.p.cns.me
+          - 3.p.cns.me
+          - 4.p.cns.me
+      run_once: true
+
+    - name: create grafana_db gluster volume with multiple bricks
+      gluster_volume:
+        state: present
+        name: influx_grafana_db
+        replicas: 4
+        force: true
+        bricks: /brick/grafana_db
+        cluster:
+          - 1.p.cns.me
+          - 2.p.cns.me
+          - 3.p.cns.me
+          - 4.p.cns.me
+      run_once: true
+
+    - name: create grafana_config gluster volume with multiple bricks
+      gluster_volume:
+        state: present
+        name: influx_grafana_config
+        replicas: 4
+        force: true
+        bricks: /brick/grafana_config
+        cluster:
+          - 1.p.cns.me
+          - 2.p.cns.me
+          - 3.p.cns.me
+          - 4.p.cns.me
+      run_once: true
+
+    - name: superesede dhcp search settings /etc/dhcp/dhclient.conf
+      blockinfile:
+        path: /etc/dhcp/dhclient.conf
+        block: |
+          supersede domain-search "";
+          supersede domain-name "";
+
+  handlers:
+  - name: Restart Rsyslog
+    service: 
+      name: rsyslog
+      state: restarted
+      enabled: yes
+
+- hosts: swarm
+  serial: 1
+  tasks:
+    - name: Reboot
+      command: /sbin/reboot removes=/var/run/reboot-required
+
+    - name: Wait for the server to reboot
+      local_action: wait_for host= port=22

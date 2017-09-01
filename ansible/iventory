@@ -1,0 +1,11 @@
+1.p.cns.me
+2.p.cns.me
+3.p.cns.me
+4.p.cns.me
+
+[docker_swarm_manager]
+1.p.cns.me swarm_labels='["zwave"]'
+[2:4].p.cns.me
+
+[docker_swarm_worker]
+1.p.cns.me swarm_labels='["zwave"]'
