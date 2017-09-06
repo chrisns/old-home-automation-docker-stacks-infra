@@ -4,9 +4,6 @@ services:
     image: pinked/docker-flow-proxy-refreshing-error-pages
     healthcheck:
       test: "wget -q -O /dev/null $STATS_USER:$STATS_PASS@localhost/admin?stats || exit 1"
-      interval: 30s
-      timeout: 10s
-      retries: 3
     ports:
       - 80:80
       - 443:443
@@ -39,6 +36,8 @@ services:
       - proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: "wget -q -O /dev/null localhost:8080/v1/docker-flow-swarm-listener/notify-services || exit 1"
     environment:
       - DF_NOTIF_CREATE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/reconfigure
       - DF_NOTIF_REMOVE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/remove
