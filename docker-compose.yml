@@ -22,13 +22,9 @@ services:
       resources:
         limits:
           cpus: '0.50'
-          memory: 64M
-        reservations:
-          cpus: '0.10'
-          memory: 16M
+          memory: 128M
       restart_policy:
         condition: any
-        delay: 5s
 
   swarm-listener:
     image: vfarcic/docker-flow-swarm-listener
@@ -48,6 +44,10 @@ services:
       restart_policy:
         condition: any
         delay: 5s
+      resources:
+        limits:
+          cpus: '0.40'
+          memory: 128M
 
   cron:
     image: pinked/docker-flow-cron2
@@ -69,7 +69,6 @@ services:
         constraints: [node.role == manager]
       restart_policy:
         condition: any
-        delay: 5s
 
   lets-encrypt:
     labels:
