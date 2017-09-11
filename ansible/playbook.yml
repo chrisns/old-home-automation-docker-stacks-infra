@@ -39,7 +39,7 @@
 
   become: yes
   roles:
-    - { role: whiskerlabs.watchdog } 
+    - { role: whiskerlabs.watchdog }
     - { role: atosatto.docker-swarm }
     - { role: angstwad.docker_ubuntu }
 
@@ -231,6 +231,20 @@
         block: |
           supersede domain-search "";
           supersede domain-name "";
+
+    - name: force FSCK to fix
+      blockinfile:
+        path: /etc/default/rcS
+        block: |
+          FSCKFIX=yes
+
+    - name: double force FSCK to fix
+      replace:
+        path: /etc/init.d/checkroot.sh
+        regexp: 'FSCKFIX=no'
+        replace: 'FSCKFIX=yes'
+        backup: no
+
 
   handlers:
   - name: Restart Rsyslog
