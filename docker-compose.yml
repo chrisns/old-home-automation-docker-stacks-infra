@@ -1,4 +1,4 @@
-version: "3"
+version: "3.3"
 services:
   proxy:
     image: pinked/docker-flow-proxy-refreshing-error-pages
@@ -16,12 +16,15 @@ services:
       - STATS_PASS=${STATS_PASS}
       - TERMINATE_ON_RELOAD=true
       - DO_NOT_RESOLVE_ADDR=true
-
+    secrets:
+      - cert-combined.pem
     deploy:
       update_config:
         parallelism: 1
-        delay: 10s
-      replicas: 2
+        delay: 40s
+        failure_action: rollback
+        monitor: 60s
+      replicas: 3
       resources:
         limits:
           cpus: '0.50'
@@ -77,15 +80,12 @@ services:
     labels:
       - com.df.cron2=true
       - com.df.distribute=true
-      - com.df.schedule=*/10 * * * *
+      - com.df.schedule=0 9 * * *
     image: pinked/docker-flow-lets-encrypt-godaddy
-    networks:
-      - proxy
     volumes:
       - letsencrypt:/etc/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - DF_NOTIF_CERT_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/cert
       - TLD=${TLD}
       - CNAME=${CNAME}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
@@ -104,8 +104,6 @@ services:
         reservations:
           cpus: '0.50'
           memory: 64M
-      placement:
-        constraints: [node.role == manager]
 
 networks:
   default:
@@ -115,4 +113,8 @@ networks:
 
 volumes:
   letsencrypt:
-    driver: glusterfs 
+    driver: glusterfs
+
+secrets:
+  cert-combined.pem:
+    external: true
