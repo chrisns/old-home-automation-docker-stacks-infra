@@ -3,7 +3,7 @@ services:
   proxy:
     image: pinked/docker-flow-proxy-refreshing-error-pages
     healthcheck:
-      test: "wget -q -O /dev/null $STATS_USER:$STATS_PASS@localhost/admin?stats || exit 1"
+      test: wget -qO- "http://localhost:8080/v1/docker-flow-proxy/ping"
     ports:
       - 80:80
       - 443:443
@@ -14,6 +14,9 @@ services:
       - MODE=swarm
       - STATS_USER=${STATS_USER}
       - STATS_PASS=${STATS_PASS}
+      - TERMINATE_ON_RELOAD=true
+      - DO_NOT_RESOLVE_ADDR=true
+
     deploy:
       update_config:
         parallelism: 1
